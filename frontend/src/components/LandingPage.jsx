@@ -5,7 +5,7 @@ import {
   Award, Building2, ChevronRight, Sparkles, FileText, Lock
 } from 'lucide-react';
 
-export default function LandingPage({ onLoginClick }) {
+export default function LandingPage({ onLoginClick, onQuickDemo }) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       {/* Top Bar / Navigation */}
@@ -21,7 +21,7 @@ export default function LandingPage({ onLoginClick }) {
                 HealthCare Pro
               </span>
               <span className="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
-                Hospital System
+                Hospital Management Suite
               </span>
             </div>
           </div>
@@ -31,12 +31,28 @@ export default function LandingPage({ onLoginClick }) {
             <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
             <a href="#departments" className="hover:text-blue-600 transition-colors">Departments</a>
             <a href="#stats" className="hover:text-blue-600 transition-colors">Analytics</a>
-            <a href="#about" className="hover:text-blue-600 transition-colors">About Us</a>
-            <a href="#contact" className="hover:text-blue-600 transition-colors">Contact</a>
+            <a href="#about" className="hover:text-blue-600 transition-colors">About System</a>
           </nav>
 
-          {/* Top-Right Login Button */}
-          <div className="flex items-center gap-4">
+          {/* Top-Right Login & Quick Demo Buttons */}
+          <div className="flex items-center gap-3">
+            {onQuickDemo && (
+              <div className="hidden sm:flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button
+                  onClick={() => onQuickDemo('admin')}
+                  className="px-2.5 py-1 bg-slate-900 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer hover:bg-slate-800"
+                >
+                  👑 Admin Demo
+                </button>
+                <button
+                  onClick={() => onQuickDemo('doctor')}
+                  className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer hover:bg-blue-700"
+                >
+                  🩺 Doctor Demo
+                </button>
+              </div>
+            )}
+
             <button
               onClick={onLoginClick}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm cursor-pointer"
@@ -61,19 +77,49 @@ export default function LandingPage({ onLoginClick }) {
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-blue-800 text-xs font-semibold">
                 <Sparkles className="h-4 w-4 text-blue-600" />
-                <span>Next-Generation Healthcare Management</span>
+                <span>Next-Generation Enterprise Healthcare System</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-                Smart Hospital Management{' '}
+                Smart Hospital Operations{' '}
                 <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 bg-clip-text text-transparent">
                   Made Effortless
                 </span>
               </h1>
 
               <p className="text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Streamline clinical workflows, patient registrations, doctor assignments, and automated billing in one secure, unified platform. Built for modern medical institutions.
+                Streamline ward bed allocation, electronic medical records (EHR), doctor consultations, automated billing, and SMS patient dispatch in one unified platform.
               </p>
+
+              {/* 1-Click Quick Demo Launcher Bar inside Hero */}
+              {onQuickDemo && (
+                <div className="p-3 bg-white/80 backdrop-blur rounded-2xl border border-slate-200/80 shadow-sm max-w-md mx-auto lg:mx-0 space-y-2">
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>1-Click Live Presentation Launcher</span>
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => onQuickDemo('admin')}
+                      className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
+                    >
+                      👑 Admin Portal
+                    </button>
+                    <button
+                      onClick={() => onQuickDemo('doctor')}
+                      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
+                    >
+                      🩺 Doctor Portal
+                    </button>
+                    <button
+                      onClick={() => onQuickDemo('receptionist')}
+                      className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
+                    >
+                      🏥 Front Desk
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-2 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
@@ -179,14 +225,21 @@ export default function LandingPage({ onLoginClick }) {
                   </div>
                 </div>
 
-                {/* Floating badge */}
-                <div className="absolute -bottom-5 -left-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white p-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700">
-                  <div className="p-2 bg-blue-500 text-white rounded-xl">
-                    <ShieldCheck size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold">HIPAA Compliant</p>
-                    <p className="text-[10px] text-slate-400">Encrypted Patient Data</p>
+                {/* HIPAA Security Compliance Footer Bar (Cleanly Positioned) */}
+                <div className="pt-3 border-t border-slate-100">
+                  <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-3 rounded-2xl shadow-md flex items-center justify-between border border-slate-800">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-blue-600 text-white rounded-xl shadow-xs">
+                        <ShieldCheck size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold leading-tight">HIPAA Compliant System</p>
+                        <p className="text-[10px] text-slate-300">256-Bit Encrypted EHR & Patient Data</p>
+                      </div>
+                    </div>
+                    <span className="hidden sm:inline-block text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-400/30">
+                      Verified
+                    </span>
                   </div>
                 </div>
               </div>

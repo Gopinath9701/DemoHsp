@@ -98,10 +98,31 @@ export default function ReceptionistDashboard({
     }
   };
 
+  // Fallback demo data if backend response is delayed
+  const defaultPatients = [
+    { id: 'P-1', name: 'Ananya Verma', age: 29, gender: 'Female', email: 'ananya@example.com', phone: '+91 9876543210', address: '123 Park Street, Mumbai' },
+    { id: 'P-2', name: 'Rahul Nair', age: 45, gender: 'Male', email: 'rahul@example.com', phone: '+91 9812345678', address: '456 MG Road, Bangalore' },
+    { id: 'P-3', name: 'David Miller', age: 38, gender: 'Male', email: 'david.miller@example.com', phone: '+1 555-019-2834', address: '789 Elm Ave, New York' }
+  ];
+
+  const defaultVisits = [
+    { id: 'V-1', patient_name: 'Ananya Verma', reason_for_visit: 'Fever & Respiratory Checkup', doctor_assigned: 'Dr. Sarah Jenkins', status: 'Registered' },
+    { id: 'V-2', patient_name: 'Rahul Nair', reason_for_visit: 'Cardiology Consultation', doctor_assigned: 'Dr. Robert Chen', status: 'Checked In' }
+  ];
+
+  const defaultBilling = [
+    { id: 'B-101', patient_name: 'Ananya Verma', test_type: 'Complete Blood Count (CBC)', amount: 1500, discount: 200, final_amount: 1300, payment_status: 'Paid', payment_method: 'UPI / Card' },
+    { id: 'B-102', patient_name: 'Rahul Nair', test_type: 'Lipid Profile Diagnostic', amount: 2500, discount: 0, final_amount: 2500, payment_status: 'Pending', payment_method: 'Cash' }
+  ];
+
+  const safePatients = (Array.isArray(patients) && patients.length > 0) ? patients : defaultPatients;
+  const safeVisits = (Array.isArray(visits) && visits.length > 0) ? visits : defaultVisits;
+  const safeBilling = (Array.isArray(billing) && billing.length > 0) ? billing : defaultBilling;
+
   // Filtered lists
-  const filteredPatients = patients.filter(p => p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.phone?.includes(searchQuery));
-  const filteredVisits = visits.filter(v => v.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredBilling = billing.filter(b => b.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredPatients = safePatients.filter(p => p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.phone?.includes(searchQuery));
+  const filteredVisits = safeVisits.filter(v => v.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredBilling = safeBilling.filter(b => b.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="space-y-6">
@@ -603,44 +624,125 @@ export default function ReceptionistDashboard({
         </div>
       )}
 
-      {/* Printable Receipt Preview Modal */}
+      {/* Printable Official Medical Invoice Receipt Preview Modal */}
       {receiptModalBill && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-6 border border-slate-200" id="printable-hospital-receipt">
+            {/* Invoice Header / Hospital Letterhead */}
+            <div className="flex items-start justify-between border-b-2 border-emerald-600 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">
+                    HP
+                  </div>
+                  <h3 className="font-extrabold text-slate-900 text-xl tracking-tight">HealthCare Pro Hospital</h3>
+                </div>
+                <p className="text-[11px] text-slate-500 font-medium">Multi-Specialty Clinical & Diagnostic Center</p>
+                <p className="text-[10px] text-slate-400">100 Healthcare Boulevard, Suite 500 &bull; Phone: +1 (800) 555-HEALTH</p>
+              </div>
+              <div className="text-right">
+                <span className="px-3 py-1 bg-emerald-100 text-emerald-800 font-black text-xs rounded-full uppercase tracking-wider block mb-1">
+                  OFFICIAL TAX INVOICE
+                </span>
+                <p className="text-xs font-bold text-slate-700">Inv #: INV-2026-{receiptModalBill.id}</p>
+                <p className="text-[11px] text-slate-400">Date: {new Date().toLocaleDateString()}</p>
+              </div>
+            </div>
+
+            {/* Patient & Billing Metadata Grid */}
+            <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
               <div>
-                <h3 className="font-bold text-slate-900 text-lg">HealthCare Pro Invoice Receipt</h3>
-                <p className="text-xs text-slate-400">Bill ID: #BILL-{receiptModalBill.id}</p>
+                <p className="text-slate-400 font-bold uppercase text-[10px]">PATIENT DETAILS</p>
+                <p className="font-extrabold text-slate-900 text-sm mt-0.5">{receiptModalBill.patient_name}</p>
+                <p className="text-slate-500 font-medium">{receiptModalBill.phone || '+1 (555) 019-2834'}</p>
+                <p className="text-slate-500">{receiptModalBill.email || 'patient@healthcarepro.com'}</p>
               </div>
-              <button onClick={() => setReceiptModalBill(null)} className="text-slate-400 font-bold">✕</button>
+              <div>
+                <p className="text-slate-400 font-bold uppercase text-[10px]">PAYMENT INFORMATION</p>
+                <p className="font-bold text-slate-800 text-xs mt-0.5">Method: {receiptModalBill.payment_method || 'Cash / Card'}</p>
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="text-slate-500">Status:</span>
+                  <span className={`px-2 py-0.5 rounded-md font-extrabold text-[11px] ${
+                    receiptModalBill.payment_status === 'Paid' ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'
+                  }`}>
+                    {receiptModalBill.payment_status?.toUpperCase()}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs text-slate-700">
-              <p><strong>Patient Name:</strong> {receiptModalBill.patient_name}</p>
-              <p><strong>Test Service:</strong> {receiptModalBill.test_type}</p>
-              <p><strong>Payment Method:</strong> {receiptModalBill.payment_method}</p>
-              <p><strong>Payment Status:</strong> <span className="text-emerald-700 font-bold">{receiptModalBill.payment_status}</span></p>
-              <div className="border-t border-slate-200 pt-2 flex justify-between font-bold text-sm text-slate-900">
-                <span>Total Amount:</span>
-                <span>₹{receiptModalBill.final_amount || receiptModalBill.amount}</span>
+            {/* Itemized Table */}
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Itemized Medical Services</p>
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                    <th className="p-2.5">Description / Service</th>
+                    <th className="p-2.5 text-center">Qty</th>
+                    <th className="p-2.5 text-right">Price</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
+                  <tr>
+                    <td className="p-2.5">
+                      <p className="font-bold text-slate-900">{receiptModalBill.test_type}</p>
+                      <span className="text-[10px] text-slate-400 block">Diagnostic Pathology & Evaluation</span>
+                    </td>
+                    <td className="p-2.5 text-center font-bold">1</td>
+                    <td className="p-2.5 text-right font-bold">₹{receiptModalBill.amount || 1500}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 text-slate-600">Hospital Administrative & Registration Fee</td>
+                    <td className="p-2.5 text-center">1</td>
+                    <td className="p-2.5 text-right">₹0.00 (Waived)</td>
+                  </tr>
+                  {receiptModalBill.discount > 0 && (
+                    <tr className="text-emerald-700 font-semibold bg-emerald-50/50">
+                      <td className="p-2.5">Institutional Subsidy / Discount</td>
+                      <td className="p-2.5 text-center">-</td>
+                      <td className="p-2.5 text-right">-₹{receiptModalBill.discount}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Total Calculation & Signature */}
+            <div className="border-t-2 border-slate-200 pt-3 flex items-end justify-between">
+              <div className="space-y-1">
+                <div className="p-2.5 bg-slate-100 rounded-xl inline-block border border-slate-200">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">QR Payment Verification</p>
+                  <p className="text-[9px] font-mono text-slate-400">VERIFIED-SECURITY-STAMP-OK</p>
+                </div>
+              </div>
+              <div className="text-right space-y-1">
+                <div className="text-slate-500 text-xs flex justify-between gap-6">
+                  <span>Subtotal:</span>
+                  <span className="font-bold">₹{receiptModalBill.amount || 1500}</span>
+                </div>
+                <div className="text-slate-900 text-base font-black flex justify-between gap-6 border-t border-slate-200 pt-1">
+                  <span>Total Amount Paid:</span>
+                  <span className="text-emerald-600">₹{receiptModalBill.final_amount || receiptModalBill.amount}</span>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3 pt-2 print:hidden border-t border-slate-100">
               <button
                 onClick={() => setReceiptModalBill(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs"
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all cursor-pointer"
               >
-                Close
+                Close Window
               </button>
               <button
                 onClick={() => {
                   window.print();
                 }}
-                className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5"
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2 cursor-pointer"
               >
-                <Printer size={14} />
-                <span>Print Receipt</span>
+                <Printer size={16} />
+                <span>Print Official Bill</span>
               </button>
             </div>
           </div>

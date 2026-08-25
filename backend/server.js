@@ -446,6 +446,52 @@ app.get('/api/system/concurrency', (req, res) => {
   });
 });
 
+// 9.5. WARD BED OCCUPANCY & CAPACITY API
+let wardBedData = [
+  { ward: 'ICU (Intensive Care)', totalBeds: 20, occupied: 16, available: 4, reserved: 0, headNurse: 'Sr. Maria Garcia' },
+  { ward: 'Emergency / ER Unit', totalBeds: 25, occupied: 18, available: 5, reserved: 2, headNurse: 'Sr. Sarah Jenkins' },
+  { ward: 'Surgical Care Ward', totalBeds: 30, occupied: 21, available: 8, reserved: 1, headNurse: 'Sr. Amanda Hayes' },
+  { ward: 'Pediatric Care Unit', totalBeds: 15, occupied: 8, available: 6, reserved: 1, headNurse: 'Sr. Clara Vance' },
+  { ward: 'General Medical Ward', totalBeds: 40, occupied: 28, available: 10, reserved: 2, headNurse: 'Sr. Jessica Lin' }
+];
+
+app.get('/api/wards', (req, res) => {
+  res.json(wardBedData);
+});
+
+// 9.6. ELECTRONIC PRESCRIPTION (e-Rx) API
+let ePrescriptions = [
+  {
+    id: 'RX-9012',
+    patient_name: 'Ananya Verma',
+    patient_age: 29,
+    doctor_name: 'Dr. Sarah Jenkins',
+    diagnosis: 'Acute Bronchitis & Fever',
+    medications: [
+      { name: 'Amoxicillin 500mg', frequency: '1-0-1 (After meals)', duration: '5 Days' },
+      { name: 'Paracetamol 650mg', frequency: '1-1-1 (SOS for fever)', duration: '3 Days' },
+      { name: 'Levocetirizine 5mg', frequency: '0-0-1 (At bedtime)', duration: '5 Days' }
+    ],
+    vitals: { bp: '120/80 mmHg', hr: '74 bpm', temp: '99.1 °F', spo2: '98%' },
+    instructions: 'Rest well, drink warm liquids, avoid chilled items.',
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString()
+  }
+];
+
+app.get('/api/prescriptions', (req, res) => {
+  res.json(ePrescriptions);
+});
+
+app.post('/api/prescriptions', (req, res) => {
+  const newRx = {
+    id: `RX-${Math.floor(1000 + Math.random() * 9000)}`,
+    ...req.body,
+    created_at: new Date().toISOString()
+  };
+  ePrescriptions.unshift(newRx);
+  res.json({ success: true, prescription: newRx });
+});
+
 // 9. AUTOMATED BACKUP & COMPLIANCE APIs
 let backupLogs = [
   { id: 1, type: 'Automated Daily Cloud Snapshot', timestamp: new Date(Date.now() - 3600000 * 4).toISOString(), size: '256.4 MB', status: 'Success' },
